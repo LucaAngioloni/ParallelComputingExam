@@ -14,7 +14,7 @@ LIBFLAGS=$(foreach TMP,$(LIBPATHS),-L$(TMP))
 all: $(SOURCES) $(BINARY)
 
 $(BINARY): $(OBJECTS)
-	$(CC) $(LIBFLAGS) $(OBJECTS) -o $@
+	$(CC) $(LIBFLAGS) $(OBJECTS) -fopenmp -o $@
 
 .cpp.o:
 	$(CC) $(INCFLAGS) $(CFLAGS) $< -o $@

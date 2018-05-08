@@ -33,7 +33,7 @@
 int main(){
 
 	int width, height, bpp;
-	uint8_t* rgb_image = stbi_load("image.png", &width, &height, &bpp, 1);
+	uint8_t* rgb_image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
 
 	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 

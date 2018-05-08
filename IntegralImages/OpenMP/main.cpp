@@ -32,9 +32,13 @@
 
 int main(){
 	int width, height, bpp;
-	uint8_t* rgb_image = stbi_load("image.png", &width, &height, &bpp, 1);
+	uint8_t* rgb_image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
 
 	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+    // uint8_t a[] = {1,2,3,7,2,3,1,0,2};
+    // uint8_t* rgb_image = &a[0];
+    // width = 3;
+    // height = 3;
 
     std::cout << "Calculating Integral Image..." << std::endl;
 
@@ -42,6 +46,11 @@ int main(){
     start=clock();
 
     unsigned long* integral_image = integralImageMP(rgb_image, height, width);
+
+    // for (int i = 0; i < 9; ++i)
+    // {
+    //     std::cout << integral_image[i] << " ";
+    // }
 
     end = clock();
 

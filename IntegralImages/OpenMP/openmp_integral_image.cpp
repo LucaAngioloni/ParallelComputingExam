@@ -23,10 +23,41 @@
 #include "openmp_integral_image.h"
 
 unsigned long * integralImageMP(img_type*x, int n, int m){
-    unsigned long * out = new unsigned long[1000];
-    for (int i = 0; i < 1000; ++i)
+    unsigned long * out = new unsigned long[n*m];
+    unsigned long * rows = new unsigned long[n*m];
+
+    int i, j;
+
+    #pragma omp parallel
+    #pragma omp for
+    for (i = 0; i < n; ++i)
     {
-        out[i] = 0;
+        for (j = 0; j < m; ++j)
+        {
+            if (j >=1)
+            {
+                rows[i*m + j] = x[i*m + j] + rows[i*m + j - 1];
+            } else {
+                rows[i*m + j] = x[i*m + j];
+            } 
+        }
     }
+
+    #pragma omp parallel
+    #pragma omp for
+    for (j = 0; j < m; ++j)
+    {
+        for (i = 0; i < n; ++i)
+        {
+            if (i >=1)
+            {
+                out[i*m + j] = rows[i*m + j] + out[(i-1)*m + j];
+            } else {
+                out[i*m + j] = rows[i*m + j];
+            } 
+        }
+    }
+
+    delete [] rows;
     return out;
 }
