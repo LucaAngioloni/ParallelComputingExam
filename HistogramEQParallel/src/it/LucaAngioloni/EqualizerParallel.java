@@ -108,7 +108,7 @@ public class EqualizerParallel {
         equalizers[threads-1] = new EqualizedValuesCalculator(v, (threads-1)*size_per_thread, size, lookup, newV);
 
         //launch threads
-        launchThreadsPool(threads, equalizers);
+        launchThreads(threads, equalizers);
         //finished threads
 
         return newV;

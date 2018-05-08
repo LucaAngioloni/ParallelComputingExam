@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        String image_path = "images/poppysat.jpg";
+        String image_path = "images/t2.jpg";
         File f1 = new File(image_path);
 
         BufferedImage img;
@@ -20,37 +20,46 @@ public class Main {
 
         HSVImage hsv_img = new HSVImage(img);
 
-        long total = 0;
+        long total_serial = 0;
+        long total_parallel = 0;
         long start;
-        long duration;
-        double parz;
-        float[] newV = new float [hsv_img.getNumPixels()];
-
-        start = System.nanoTime();
-        newV = EqualizerSerial.equalize(hsv_img.getV(), hsv_img.getNumPixels());
-        duration = System.nanoTime() - start;
-        //stop timer
-        parz = (double) duration/1000000000.0;
-        //System.out.println("duration " + parz);
+        long duration_serial;
+        long duration_parallel;
+        double parz_serial;
+        double parz_parallel;
+        float[] newV_serial = new float[256];
+        float[] newV_parallel = new float[256];
 
         for (int i = 0; i<101;i++) {
+            //SERIAL
             //start timer
             start = System.nanoTime();
-            newV = EqualizerSerial.equalize(hsv_img.getV(), hsv_img.getNumPixels());
-            duration = System.nanoTime() - start;
+            newV_serial = EqualizerSerial.equalize(hsv_img.getV(), hsv_img.getNumPixels());
+            duration_serial = System.nanoTime() - start;
             //stop timer
-                parz = (double) duration/1000000000.0;
-                //System.out.println("duration " + parz);
-                if (i!=0){
-                    total += duration;
+                parz_serial = (double) duration_serial/1000000000.0;
+                //System.out.println("duration " + parz_serial);
+            if (i!=0){
+                total_serial += duration_serial;
+            }
+
+            //PARALLEL
+            start = System.nanoTime();
+            newV_parallel = EqualizerParallel.equalize(hsv_img.getV(), hsv_img.getNumPixels());
+            duration_parallel = System.nanoTime() - start;
+            //stop timer
+            parz_parallel = (double) duration_parallel/1000000000.0;
+            //System.out.println("duration " + parz);
+            if (i!=0){
+                total_parallel += duration_parallel;
             }
         }
 
-        double seconds = (double)total / 1000000000.0;
-        seconds = seconds/100;
-        System.out.println("The Serial equalization algorithm took average: " + seconds + " s");
+        double seconds_serial = (double)total_serial / 1000000000.0;
+        seconds_serial = seconds_serial/100;
+        System.out.println("The Serial equalization algorithm took average: " + seconds_serial + " s");
 
-        hsv_img.setV(newV);
+        hsv_img.setV(newV_serial);
 
         BufferedImage equalized = hsv_img.getRGBImage();
 
@@ -61,26 +70,10 @@ public class Main {
             e.printStackTrace();
         }
 
-        total = 0;
-        float[] newV_parallel = new float[hsv_img.getNumPixels()];
-        for (int i = 0; i<101;i++) {
-            //start timer
-            start = System.nanoTime();
-            newV_parallel = EqualizerParallel.equalize(hsv_img.getV(), hsv_img.getNumPixels());
-            duration = System.nanoTime() - start;
-            //stop timer
-            parz = (double) duration/1000000000.0;
-            //System.out.println("duration " + parz);
-            if (i!=0){
-                total += duration;
-            }
-        }
 
-
-        seconds = (double)total / 1000000000.0;
-        seconds = seconds/100;
-        System.out.println("The Parallel equalization algorithm took average: " + seconds + " s");
-
+        double seconds_parallel = (double)total_parallel / 1000000000.0;
+        seconds_parallel = seconds_parallel/100;
+        System.out.println("The Parallel equalization algorithm took average: " + seconds_parallel + " s");
 
         hsv_img.setV(newV_parallel);
 
