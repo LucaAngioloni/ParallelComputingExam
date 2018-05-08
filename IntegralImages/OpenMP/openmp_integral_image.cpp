@@ -23,5 +23,10 @@
 #include "openmp_integral_image.h"
 
 unsigned long * integralImageMP(img_type*x, int n, int m){
-    
+    unsigned long * out = new unsigned long[1000];
+    for (int i = 0; i < 1000; ++i)
+    {
+        out[i] = 0;
+    }
+    return out;
 }

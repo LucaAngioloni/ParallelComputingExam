@@ -1,10 +1,10 @@
-BINARY=sequential
+BINARY=openmp
 SOURCES= main.cpp openmp_integral_image.cpp
 LIBRARY=exec
 INCPATHS= ../utils
 LIBPATHS=
 CFLAGS=-fopenmp -c -Wall -O3
-CC=gcc-8
+CC=g++-8
 
 OBJECTS=$(SOURCES:.cpp=.o)
 INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
