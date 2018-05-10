@@ -26,13 +26,10 @@ unsigned long * integralImageMP(img_type*x, int n, int m){
     unsigned long * out = new unsigned long[n*m];
     unsigned long * rows = new unsigned long[n*m];
 
-    int i, j;
-
-    #pragma omp parallel
-    #pragma omp for
-    for (i = 0; i < n; ++i)
+    #pragma omp parallel for
+    for (int i = 0; i < n; ++i)
     {
-        for (j = 0; j < m; ++j)
+        for (int j = 0; j < m; ++j)
         {
             if (j >=1)
             {
@@ -43,11 +40,10 @@ unsigned long * integralImageMP(img_type*x, int n, int m){
         }
     }
 
-    #pragma omp parallel
-    #pragma omp for
-    for (j = 0; j < m; ++j)
+    #pragma omp parallel for
+    for (int j = 0; j < m; ++j)
     {
-        for (i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
         {
             if (i >=1)
             {

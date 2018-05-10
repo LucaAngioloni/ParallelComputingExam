@@ -28,7 +28,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include <time.h>
+#include <sys/time.h>
 
 int main(){
 
@@ -39,14 +39,14 @@ int main(){
 
     std::cout << "Calculating Integral Image..." << std::endl;
 
-    clock_t start, end;
-    start=clock();
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
 
     unsigned long* integral_image = integralImage(rgb_image, height, width);
 
-    end = clock();
+    gettimeofday(&end, NULL);
 
-    double time_tot = ((double)(end - start))/CLOCKS_PER_SEC;
+    double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
 
     std::cout << "Total time: " << time_tot <<std::endl;
 
