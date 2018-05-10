@@ -3,7 +3,7 @@ SOURCES= main.cpp sequential_integral_image.cpp
 LIBRARY=exec
 INCPATHS= ../utils
 LIBPATHS=
-CFLAGS=-c -Wall -O3
+CFLAGS=-c -Wall
 CC=g++
 
 OBJECTS=$(SOURCES:.cpp=.o)

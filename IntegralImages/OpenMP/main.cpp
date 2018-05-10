@@ -28,39 +28,27 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include <sys/time.h>
+#include <omp.h>
 
 int main(){
 	int width, height, bpp;
-	uint8_t* rgb_image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
+	uint8_t* image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
 
 	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
-    // uint8_t a[] = {1,2,3,7,2,3,1,0,2};
-    // uint8_t* rgb_image = &a[0];
-    // width = 3;
-    // height = 3;
 
     std::cout << "Calculating Integral Image..." << std::endl;
 
-    struct timeval start, end;
-    gettimeofday(&start, NULL);
+    double start_omp = omp_get_wtime();
 
-    unsigned long* integral_image = integralImageMP(rgb_image, height, width);
+    unsigned long* integral_image = integralImageMP(image, height, width);
 
-    // for (int i = 0; i < 9; ++i)
-    // {
-    //     std::cout << integral_image[i] << " ";
-    // }
+    double end_omp = omp_get_wtime();
 
-    gettimeofday(&end, NULL);
-
-    double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
-
-    std::cout << "Total time: " << time_tot <<std::endl;
+    std::cout << "Total time wall time omp: " << end_omp - start_omp <<std::endl;
 
     delete [] integral_image;
 
-    stbi_image_free(rgb_image);
+    stbi_image_free(image);
     
 	return 0;
 }

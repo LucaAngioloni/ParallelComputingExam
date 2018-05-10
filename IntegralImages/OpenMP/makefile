@@ -3,7 +3,7 @@ SOURCES= main.cpp openmp_integral_image.cpp
 LIBRARY=exec
 INCPATHS= ../utils
 LIBPATHS=
-CFLAGS=-fopenmp -c -Wall -O3
+CFLAGS=-fopenmp -c -Wall
 CC=g++-8
 
 OBJECTS=$(SOURCES:.cpp=.o)
