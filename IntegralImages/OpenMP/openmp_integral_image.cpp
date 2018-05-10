@@ -27,7 +27,12 @@ unsigned long * integralImageMP(img_type*x, int n, int m){
     unsigned long * rows = new unsigned long[n*m];
 
     #pragma omp parallel
+<<<<<<< HEAD
     #pragma omp for
+=======
+
+    #pragma omp  for
+>>>>>>> f900845077aad521ac89f0d0cc74cca8514165e1
     for (int i = 0; i < n; ++i)
     {
         for (int j = 0; j < m; ++j)
@@ -41,7 +46,11 @@ unsigned long * integralImageMP(img_type*x, int n, int m){
         }
     }
     //intel profiling vtune
+<<<<<<< HEAD
     #pragma omp for
+=======
+    #pragma omp  for
+>>>>>>> f900845077aad521ac89f0d0cc74cca8514165e1
     for (int j = 0; j < m; ++j)
     {
         for (int i = 0; i < n; ++i)
