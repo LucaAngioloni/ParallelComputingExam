@@ -22,16 +22,16 @@ LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_CUDA)
 .SUFFIXES: .c .cpp .cu .o
 
 %.c.o: %.c
-        $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.cu.o: %.cu
-        $(NVCC) $(NVCCFLAGS) -c $< -o $@
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
 %.cpp.o: %.cpp
-        $(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS) Makefile
-        $(LINKLINE)
+	$(LINKLINE)
 
 distclean: clean
 	rm -f $(TARGET)
