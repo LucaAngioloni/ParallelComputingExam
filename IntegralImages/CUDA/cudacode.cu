@@ -1,4 +1,5 @@
 #include "cudacode.h"
+#include <cuda.h>
 
 __global__ void image_integral(int *a, int*b, int rowsTotal,int colsTotal)
 {
