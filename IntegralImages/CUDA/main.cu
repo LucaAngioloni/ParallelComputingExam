@@ -191,11 +191,11 @@ int main(int argc, char **argv)
         struct timeval start, end;
         gettimeofday(&start, NULL);
 
-        int num_thread = height;
+        int num_thread = 3000;
 
         
-        sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width, height);
-        sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width, width);
+        sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
+        sum_columns<<<num_thread,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
 
         cudaThreadSynchronize();
 
