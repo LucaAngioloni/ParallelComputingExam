@@ -57,7 +57,7 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     if (row==rowsTotal-1)
     {
         start = (n_thread-1)*size_per_thread;
-        end = rowsTotal+1;
+        end = rowsTotal;
     }
     for (int k = start; k < end; ++k)
     {
@@ -79,15 +79,27 @@ __global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, i
     // Thread Ids equal to block Ids because the each blocks contains one thread only.
     int col = blockIdx.x;
     //int row = blockIdx.y;
+    int size_per_thread = colsTotal/n_thread;
+    int start = col*size_per_thread;
+    int end = start + size_per_thread;
 
-    for (int i = 0; i < rowsTotal; ++i)
-        {
-            if (i >=1)
+    if (col==colsTotal-1)
+    {
+        start = (n_thread-1)*size_per_thread;
+        end = colsTotal;
+    }
+    for (int k = start; k < end; ++k)
+    {
+        for (int i = 0; i < rowsTotal; ++i)
             {
-                b[i*colsTotal + col] = a[i*colsTotal + col] + b[(i-1)*colsTotal + col];
-            } else {
-                b[i*colsTotal + col] = a[i*colsTotal + col];
-            } 
+                if (i >=1)
+                {
+                    b[i*colsTotal + k] = a[i*colsTotal + k] + b[(i-1)*colsTotal + k];
+                } else {
+                    b[i*colsTotal + k] = a[i*colsTotal + k];
+                } 
+        }
+
     }
 }
 
@@ -183,7 +195,7 @@ int main(int argc, char **argv)
 
         
         sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
-        sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
+        sum_columns<<<num_thread,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
 
         cudaThreadSynchronize();
 
