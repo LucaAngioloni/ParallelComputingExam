@@ -191,7 +191,7 @@ int main(int argc, char **argv)
         struct timeval start, end;
         gettimeofday(&start, NULL);
 
-        int num_thread = 5;
+        int num_thread = height;
 
         
         sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
