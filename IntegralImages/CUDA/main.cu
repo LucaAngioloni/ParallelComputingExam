@@ -52,7 +52,7 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     int row = blockIdx.x;
     int size_per_thread = rowsTotal/n_thread;
     int start = row*size_per_thread;
-    int end = size_per_thread*(row+1);
+    int end = start + size_per_thread;
 
     for (int k = start; k < end; ++k)
     {
