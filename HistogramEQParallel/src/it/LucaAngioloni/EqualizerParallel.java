@@ -51,11 +51,18 @@ public class EqualizerParallel {
     }
 
     static float[] equalize(float[] v, int size){
+        return equalize(v, size, 0);
+    }
 
+    static float[] equalize(float[] v, int size, int thread_num){
+        int threads = 0;
         //Number of threads the processor can handle at once
         //If the processor supports virtualization, this is 2*cores
-        int threads = Runtime.getRuntime().availableProcessors();
-
+        if (thread_num == 0) {
+            threads = Runtime.getRuntime().availableProcessors();
+        } else {
+            threads = thread_num;
+        }
         PartialLookupThread[] partialLookupThreads = new PartialLookupThread[threads];
 
         int size_per_thread = size/threads;
