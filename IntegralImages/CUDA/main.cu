@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 
         if (json)
         {
-            std::cout << "{time: " << time_tot << ", width: " << width << ", height: " << height << ", errors: " << count << ", time_serial: " << time_tot_serial << "}" << std::endl;   
+            std::cout << "{\"time\": " << time_tot << ", \"width\": " << width << ", \"height\": " << height << ", \"errors\": " << count << ", \"time_serial\": " << time_tot_serial << "}" << std::endl;   
         }
 
         cudaFree(d_matrix_a);

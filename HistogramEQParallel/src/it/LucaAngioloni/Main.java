@@ -112,7 +112,7 @@ public class Main {
                     e.printStackTrace();
                 }
             } else {
-                output = output + "time_serial: " + Double.toString(seconds_serial);
+                output = output + "\"time_serial\": " + Double.toString(seconds_serial);
             }
         }
 
@@ -136,7 +136,7 @@ public class Main {
                 if (serial || !parallel){
                     output = output + ", ";
                 }
-                output = output + "time_parallel: " + Double.toString(seconds_parallel);
+                output = output + "\"time_parallel\": " + Double.toString(seconds_parallel);
             }
         }
 

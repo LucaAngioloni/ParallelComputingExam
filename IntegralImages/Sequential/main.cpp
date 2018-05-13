@@ -80,7 +80,7 @@ int main(int argc, char **argv){
         
         if (json)
         {
-            std::cout << "{time: " << time_tot << ", width: " << width << ", height: " << height << "}" << std::endl;   
+            std::cout << "{\"time\": " << time_tot << ", \"width\": " << width << ", \"height\": " << height << "}" << std::endl;   
         }
         delete [] integral_image;
 
