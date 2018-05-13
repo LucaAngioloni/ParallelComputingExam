@@ -36,7 +36,7 @@ for image in images:
         output, error = process.communicate()
         output = output.decode("utf-8")
         json_data = json.loads(output)
-        squential_results[i,j] = json_data["time_serial"]
+        squential_results[i,j] = json_data["time"]
 
         t = 0
         for thread in threads:
@@ -45,14 +45,14 @@ for image in images:
             output, error = process.communicate()
             output = output.decode("utf-8")
             json_data = json.loads(output)
-            omp_results[i,j,t] = json_data["time_parallel"]
+            omp_results[i,j,t] = json_data["time"]
 
             com_cuda = cuda_comand + " -p " + image + " -t " + str(thread)
             process = subprocess.Popen(com_cuda.split(), stdout=subprocess.PIPE)
             output, error = process.communicate()
             output = output.decode("utf-8")
             json_data = json.loads(output)
-            cuda_results[i,j,t] = json_data["time_parallel"]
+            cuda_results[i,j,t] = json_data["time"]
             t = t+1
     j = j+1
 
