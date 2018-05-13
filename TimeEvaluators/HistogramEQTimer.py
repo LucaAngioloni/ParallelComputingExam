@@ -4,7 +4,7 @@ import os
 import subprocess
 import json
 
-repeats = 1
+repeats = 5
 
 threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 
@@ -28,6 +28,7 @@ parallel_results = np.zeros((repeats,len(images), len(threads)))
 
 j = 0
 for image in images:
+    print("Working on image: " + str(j))
     for i in range(repeats):
         com_serial = java_comand + " -p " + image +" -s"
         process = subprocess.Popen(com_serial.split(), stdout=subprocess.PIPE)
@@ -49,3 +50,6 @@ for image in images:
 
 print(serial_results)
 print(parallel_results)
+
+np.save("serial_results.npy", serial_results)
+np.save("parallel_results.npy", parallel_results)
