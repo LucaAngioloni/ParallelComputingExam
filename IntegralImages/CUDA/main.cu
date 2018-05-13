@@ -51,11 +51,6 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     //int col = blockIdx.x;
     int row = blockIdx.x;
     int size_per_thread = rowsTotal/n_thread;
-
-    if (row==0)
-    {
-        size_per_thread--;
-    }
     int start = row*size_per_thread;
     int end = size_per_thread*(row+1);
 
