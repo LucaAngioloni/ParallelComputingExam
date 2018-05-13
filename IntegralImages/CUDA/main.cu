@@ -177,7 +177,7 @@ int main(int argc, char **argv)
         int num_thread = height;
 
         
-        sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
+        sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
         sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
 
         cudaThreadSynchronize();
