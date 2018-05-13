@@ -68,7 +68,7 @@ __global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, i
 {
     // Thread Ids equal to block Ids because the each blocks contains one thread only.
     int col = blockIdx.x;
-    cout << col<<endl;
+    std::cout << col <<std::endl;
     //int row = blockIdx.y;
 
     for (int i = 0; i < rowsTotal; ++i)
