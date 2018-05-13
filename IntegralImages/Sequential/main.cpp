@@ -30,29 +30,55 @@
 
 #include <sys/time.h>
 
-int main(){
+#include "input_parser.h"
 
-	int width, height, bpp;
-	uint8_t* rgb_image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
+void print_help(){
+    std::cout << "usage: sequential -p <input image path>" << std::endl << std::endl;
 
-	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+    std::cout << "To see this menu again: sequential -h" << std::endl;
+}
 
-    std::cout << "Calculating Integral Image..." << std::endl;
+int main(int argc, char **argv){
+    InputParser input(argc, argv);
+    if(input.cmdOptionExists("-h")){
+        print_help();
+        return 0;
+    }
 
-    struct timeval start, end;
-    gettimeofday(&start, NULL);
+    if(input.cmdOptionExists("-p")){
+        std::string in_file = input.getCmdOption("-p");
+        if (in_file == "")
+        {
+            std::cout << "No input file!\n\n";
+            print_help();
+            return 2;
+        }
+    	int width, height, bpp;
+    	uint8_t* rgb_image = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
 
-    unsigned long* integral_image = integralImage(rgb_image, height, width);
+    	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
-    gettimeofday(&end, NULL);
+        std::cout << "Calculating Integral Image..." << std::endl;
 
-    double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+        struct timeval start, end;
+        gettimeofday(&start, NULL);
 
-    std::cout << "Total time: " << time_tot <<std::endl;
+        unsigned long* integral_image = integralImage(rgb_image, height, width);
 
-    delete [] integral_image;
+        gettimeofday(&end, NULL);
 
-    stbi_image_free(rgb_image);
-    
-	return 0;
+        double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+
+        std::cout << "Total time: " << time_tot <<std::endl;
+
+        delete [] integral_image;
+
+        stbi_image_free(rgb_image);
+        
+    	return 0;
+    } else {
+        std::cout << "No input file!\n\n";
+        print_help();
+        return 1;
+    }
 }

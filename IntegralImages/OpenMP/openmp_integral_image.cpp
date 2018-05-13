@@ -22,9 +22,14 @@
 
 #include "openmp_integral_image.h"
 
-unsigned long * integralImageMP(img_type*x, int n, int m){
+unsigned long * integralImageMP(img_type*x, int n, int m, int threads){
     unsigned long * out = new unsigned long[n*m];
     unsigned long * rows = new unsigned long[n*m];
+
+    if(threads != 0){
+        omp_set_dynamic(0);     // Explicitly disable dynamic teams
+        omp_set_num_threads(threads); // Use n threads for all consecutive parallel regions
+    }
 
     #pragma omp parallel
     #pragma omp for

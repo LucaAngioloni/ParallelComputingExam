@@ -4,10 +4,20 @@
 #include "stb_image.h"
 #include <sys/time.h>
 
+#include "input_parser.h"
+
 using namespace std;
 
 const int TILE_DIM = 32;
 const int BLOCK_ROWS = 8;
+
+int print = 0;
+
+void print_help(){
+    std::cout << "usage: cuda -p <input image path> [-t <number of threads (int) (default:platform dependent)>]" << std::endl << std::endl;
+
+    std::cout << "To see this menu again: cuda -h" << std::endl;
+}
 
 unsigned long * integralImage(uint8_t*x, int n, int m){
     unsigned long * out = (unsigned long  *)malloc(n*m*sizeof(unsigned long));
@@ -73,139 +83,158 @@ __global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, i
 
 
 
-int main()
+int main(int argc, char **argv)
 {
-    int print = 0;
-
-    int width, height, bpp;
-    uint8_t* matrix_a = stbi_load("../images/big.jpg", &width, &height, &bpp, 1);
-    int total_e = width*height;
-    int widthstep = total_e*sizeof(unsigned long);
-
-    unsigned long * a = (unsigned long  *)malloc(widthstep);
-
-    for (int i = 0; i < width *height; ++i)
-    {
-        a[i] = (unsigned long)matrix_a[i];
+    InputParser input(argc, argv);
+    if(input.cmdOptionExists("-h")){
+        print_help();
+        return 0;
     }
 
-    if (print==1)
-    {
-        cout << "Input"<<endl;
+    if(input.cmdOptionExists("-p")){
+        std::string in_file = input.getCmdOption("-p");
+        if (in_file == "")
+        {
+            std::cout << "No input file!\n\n";
+            print_help();
+            return 2;
+        }
+
+        int width, height, bpp;
+        uint8_t* matrix_a = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
+        int total_e = width*height;
+        int widthstep = total_e*sizeof(unsigned long);
+
+        unsigned long * a = (unsigned long  *)malloc(widthstep);
+
+        for (int i = 0; i < width *height; ++i)
+        {
+            a[i] = (unsigned long)matrix_a[i];
+        }
+
+        if (print==1)
+        {
+            cout << "Input"<<endl;
+            for(int r=0;r<height;r++)
+            {
+                for(int c=0; c<width;c++)
+                {
+                    cout << a[r*width+c]<<" ";
+                }
+                cout << endl;
+            }
+        }
+
+        std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+
+        std::cout << "Calculating Integral Image..." << std::endl;
+
+        unsigned long * matrix_b= (unsigned long  *)malloc(widthstep);
+        unsigned long * matrix_t= (unsigned long  *)malloc(widthstep);
+
+
         for(int r=0;r<height;r++)
         {
             for(int c=0; c<width;c++)
             {
-                cout << a[r*width+c]<<" ";
+                matrix_b[r*width+c]=0;
+                matrix_t[r*width+c]=0;
             }
-            cout << endl;
         }
-    }
 
-    std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+        std::cout << "Copied image" << std::endl;
 
-    std::cout << "Calculating Integral Image..." << std::endl;
-
-    unsigned long * matrix_b= (unsigned long  *)malloc(widthstep);
-    unsigned long * matrix_t= (unsigned long  *)malloc(widthstep);
+        unsigned long * d_matrix_a, * d_matrix_b, * d_matrix_t;
 
 
-    for(int r=0;r<height;r++)
-    {
-        for(int c=0; c<width;c++)
+        cudaMalloc(&d_matrix_a,widthstep);
+        cudaMalloc(&d_matrix_b,widthstep);
+        cudaMalloc(&d_matrix_t,widthstep);
+
+
+        cudaMemcpy(d_matrix_a,a,widthstep,cudaMemcpyHostToDevice);
+        cudaMemcpy(d_matrix_b,matrix_b,widthstep,cudaMemcpyHostToDevice);
+        cudaMemcpy(d_matrix_t,matrix_t,widthstep,cudaMemcpyHostToDevice);
+
+
+        std::cout << "starting cuda" << std::endl;
+
+
+        struct timeval start, end;
+        gettimeofday(&start, NULL);
+
+        
+        sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width);
+        sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width);
+
+        cudaThreadSynchronize();
+
+
+        gettimeofday(&end, NULL);
+
+        double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+
+        std::cout << "Total parallel time: " << time_tot <<std::endl;
+
+        cudaMemcpy(matrix_b,d_matrix_b,widthstep,cudaMemcpyDeviceToHost);
+        cudaMemcpy(matrix_t,d_matrix_t,widthstep,cudaMemcpyDeviceToHost);
+
+
+        if (print==1)
         {
-            matrix_b[r*width+c]=0;
-            matrix_t[r*width+c]=0;
-        }
-    }
-
-    std::cout << "Copied image" << std::endl;
-
-    unsigned long * d_matrix_a, * d_matrix_b, * d_matrix_t;
-
-
-    cudaMalloc(&d_matrix_a,widthstep);
-    cudaMalloc(&d_matrix_b,widthstep);
-    cudaMalloc(&d_matrix_t,widthstep);
-
-
-    cudaMemcpy(d_matrix_a,a,widthstep,cudaMemcpyHostToDevice);
-    cudaMemcpy(d_matrix_b,matrix_b,widthstep,cudaMemcpyHostToDevice);
-    cudaMemcpy(d_matrix_t,matrix_t,widthstep,cudaMemcpyHostToDevice);
-
-
-    std::cout << "starting cuda" << std::endl;
-
-
-    struct timeval start, end;
-    gettimeofday(&start, NULL);
-
-    
-    sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width);
-    sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width);
-
-    cudaThreadSynchronize();
-
-
-    gettimeofday(&end, NULL);
-
-    double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
-
-    std::cout << "Total parallel time: " << time_tot <<std::endl;
-
-    cudaMemcpy(matrix_b,d_matrix_b,widthstep,cudaMemcpyDeviceToHost);
-    cudaMemcpy(matrix_t,d_matrix_t,widthstep,cudaMemcpyDeviceToHost);
-
-
-    if (print==1)
-    {
-        cout << "Cuda Output"<<endl;
-        for(int r=0;r<height;r++)
-        {
-            for(int c=0; c<width;c++)
+            cout << "Cuda Output"<<endl;
+            for(int r=0;r<height;r++)
             {
-                cout << matrix_b[r*width+c]<<" ";
+                for(int c=0; c<width;c++)
+                {
+                    cout << matrix_b[r*width+c]<<" ";
+                }
+                cout << endl;
             }
-            cout << endl;
         }
-    }
-    
+        
 
-    std::cout << "starting serial" << std::endl;
+        std::cout << "starting serial" << std::endl;
 
-    gettimeofday(&start, NULL);
+        gettimeofday(&start, NULL);
 
-    unsigned long* integral_image = integralImage(matrix_a, height, width);
+        unsigned long* integral_image = integralImage(matrix_a, height, width);
 
-    gettimeofday(&end, NULL);
+        gettimeofday(&end, NULL);
 
-    time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+        time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
 
-    std::cout << "Total serial time: " << time_tot <<std::endl;
+        std::cout << "Total serial time: " << time_tot <<std::endl;
 
 
-    std::cout << "finish serial" << std::endl;
-    int count =0;
+        std::cout << "finish serial" << std::endl;
+        int count =0;
 
-    for (int i = 0; i < width*height; ++i)
-    {
-        if (integral_image[i]!=matrix_b[i])
+        for (int i = 0; i < width*height; ++i)
         {
-            //std::cout<<"errore";
-            count++;
+            if (integral_image[i]!=matrix_b[i])
+            {
+                //std::cout<<"errore";
+                count++;
+            }
         }
+
+        std::cout<<"Errors ";
+        std::cout<<count;
+        std::cout<<" over ";
+        std::cout<<width*height<<std::endl;
+
+
+        cudaFree(d_matrix_a);
+        cudaFree(d_matrix_b);
+        free(a);
+        free(matrix_b);
+
+        stbi_image_free(matrix_a);
+        return 0;
+    } else { // no valid arguments
+        std::cout << "No input file!\n\n";
+        print_help();
+        return 1;
     }
-
-    std::cout<<"Errors ";
-    std::cout<<count;
-    std::cout<<" over ";
-    std::cout<<width*height<<std::endl;
-
-
-    cudaFree(d_matrix_a);
-    cudaFree(d_matrix_b);
-    free(a);
-    free(matrix_b);
-
-    stbi_image_free(matrix_a);
 }

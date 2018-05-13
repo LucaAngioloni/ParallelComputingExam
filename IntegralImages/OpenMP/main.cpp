@@ -28,27 +28,63 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "input_parser.h"
+
 #include <omp.h>
 
-int main(){
-	int width, height, bpp;
-	uint8_t* image = stbi_load("../images/t2.jpg", &width, &height, &bpp, 1);
+void print_help(){
+    std::cout << "usage: openmp -p <input image path> [-t <number of threads (int) (default:platform dependent)>]" << std::endl << std::endl;
 
-	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+    std::cout << "To see this menu again: openmp -h" << std::endl;
+}
 
-    std::cout << "Calculating Integral Image..." << std::endl;
+int main(int argc, char **argv){
+    InputParser input(argc, argv);
+    if(input.cmdOptionExists("-h")){
+        print_help();
+        return 0;
+    }
 
-    double start_omp = omp_get_wtime();
+    if(input.cmdOptionExists("-p")){
+        std::string in_file = input.getCmdOption("-p");
+        if (in_file == "")
+        {
+            std::cout << "No input file!\n\n";
+            print_help();
+            return 2;
+        }
+    	int width, height, bpp;
+    	uint8_t* image = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
 
-    unsigned long* integral_image = integralImageMP(image, height, width);
+    	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
-    double end_omp = omp_get_wtime();
+        std::cout << "Calculating Integral Image..." << std::endl;
 
-    std::cout << "Total time wall time omp: " << end_omp - start_omp <<std::endl;
+        int threads = 0;
 
-    delete [] integral_image;
+        if(input.cmdOptionExists("-t")){
+            std::string num_threads_string = input.getCmdOption("-t");
+            if (num_threads_string != ""){
+                threads = atoi(num_threads_string.c_str());
+            }
+        }
 
-    stbi_image_free(image);
-    
-	return 0;
+        double start_omp = omp_get_wtime();
+
+        unsigned long* integral_image = integralImageMP(image, height, width, threads);
+
+        double end_omp = omp_get_wtime();
+
+        std::cout << "Total time wall time omp: " << end_omp - start_omp <<std::endl;
+
+        delete [] integral_image;
+
+        stbi_image_free(image);
+        
+    	return 0;
+    } else {
+        std::cout << "No input file!\n\n";
+        print_help();
+        return 1;
+    }
 }
