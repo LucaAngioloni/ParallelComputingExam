@@ -46,7 +46,7 @@ for image in images:
             json_data = json.loads(output)
             parallel_results[i,j,t] = json_data["time_parallel"]
             t = t+1
-        j = j+1
+    j = j+1
 
 print(serial_results)
 print(parallel_results)
