@@ -57,7 +57,7 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     if (row==rowsTotal-1)
     {
         start = (n_thread-1)*size_per_thread;
-        end = rowsTotal;
+        end = rowsTotal+1;
     }
     for (int k = start; k < end; ++k)
     {
@@ -86,7 +86,7 @@ __global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, i
     if (col==colsTotal-1)
     {
         start = (n_thread-1)*size_per_thread;
-        end = colsTotal;
+        end = colsTotal+1;
     }
     for (int k = start; k < end; ++k)
     {
