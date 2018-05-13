@@ -4,7 +4,14 @@ LIBRARY=exec
 INCPATHS= ../utils
 LIBPATHS=
 CFLAGS=-fopenmp -c -Wall
-CC=g++-8
+
+UNAME_S := $(shell uname -s)
+
+CC=g++
+
+ifeq ($(UNAME_S),Darwin)
+		CC=g++-8
+endif
 
 OBJECTS=$(SOURCES:.cpp=.o)
 INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
