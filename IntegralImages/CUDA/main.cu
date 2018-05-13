@@ -47,28 +47,39 @@ unsigned long * integralImage(uint8_t*x, int n, int m){
     return out;
 }
 
-__global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal)
+__global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal, int n_thread)
 {
     // Thread Ids equal to block Ids because the each blocks contains one thread only.
     //int col = blockIdx.x;
     int row = blockIdx.x;
+    int size_per_thread = rowsTotal/n_thread;
 
-    for (int j = 0; j < colsTotal; ++j)
-        {
-            if (j >=1)
+    if (row==0)
+    {
+        size_per_thread--;
+    }
+    int start = row*size_per_thread;
+    int end = size_per_thread*(row+1)
+
+    for (int k = start; k < end; ++k)
+    {
+            for (int j = 0; j < colsTotal; ++j)
             {
-                b[row*colsTotal + j] = a[row*colsTotal + j] + b[row*colsTotal + j - 1];
-            } else {
-                b[row*colsTotal + j] = a[row*colsTotal + j];
-            } 
-        }
+                if (j >=1)
+                {
+                    b[k*colsTotal + j] = a[k*colsTotal + j] + b[k*colsTotal + j - 1];
+                } else {
+                    b[k*colsTotal + j] = a[k*colsTotal + j];
+                } 
+            }
+    }
+
 }
 
-__global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal)
+__global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal, int n_thread)
 {
     // Thread Ids equal to block Ids because the each blocks contains one thread only.
     int col = blockIdx.x;
-    printf("Hello thread %d\n", threadIdx.x);
     //int row = blockIdx.y;
 
     for (int i = 0; i < rowsTotal; ++i)
@@ -170,9 +181,11 @@ int main(int argc, char **argv)
         struct timeval start, end;
         gettimeofday(&start, NULL);
 
+        int num_thread = 5;
+
         
-        sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width);
-        sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width);
+        sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
+        sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
 
         cudaThreadSynchronize();
 
