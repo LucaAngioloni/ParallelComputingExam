@@ -8,10 +8,8 @@
 
 using namespace std;
 
-const int TILE_DIM = 32;
-const int BLOCK_ROWS = 8;
 
-int print = 0;
+int print = 1;
 
 void print_help(){
     std::cout << "usage: cuda -p <input image path> [-t <number of threads (int) (default:platform dependent)>] [-json]" << std::endl << std::endl;
