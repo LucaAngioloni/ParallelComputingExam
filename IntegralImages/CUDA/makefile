@@ -1,40 +1,21 @@
-CUDA_INSTALL_PATH := /usr/local/cuda
+BINARY=cuda
+SOURCES= main.cu
+LIBRARY=exec
+INCPATHS= ../utils
+LIBPATHS=
+CFLAGS=-fopenmp -c -Wall
+CC=nvcc
 
-CXX := g++
-CC := gcc
-LINK := g++ -fPIC
-NVCC  := nvcc
+OBJECTS=$(SOURCES:.cu=.o)
+INCFLAGS=$(foreach TMP,$(INCPATHS),-I$(TMP))
+LIBFLAGS=$(foreach TMP,$(LIBPATHS),-L$(TMP))
 
-# Includes
-INCLUDES = -I. -I$(CUDA_INSTALL_PATH)/include
 
-# Common flags
-COMMONFLAGS += $(INCLUDES)
-NVCCFLAGS += $(COMMONFLAGS)
-CXXFLAGS += $(COMMONFLAGS)
-CFLAGS += $(COMMONFLAGS)
-
-LIB_CUDA := -L$(CUDA_INSTALL_PATH)/lib -lcudart
-OBJS = cudacode.cu.o main.cpp.o
-TARGET = cuda_integralimage
-LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_CUDA)
-
-.SUFFIXES: .c .cpp .cu .o
-
-%.c.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-%.cu.o: %.cu
-	$(NVCC) $(NVCCFLAGS) -c $< -o $@
-
-%.cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(TARGET): $(OBJS) Makefile
-	$(LINKLINE)
+all:
+	$(CC) $(INCFLAGS) $(SOURCES) -o $(BINARY)
 
 distclean: clean
-	rm -f $(TARGET)
+	rm -f $(BINARY)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJECTS)

@@ -6,6 +6,9 @@
 
 using namespace std;
 
+const int TILE_DIM = 32;
+const int BLOCK_ROWS = 8;
+
 unsigned long * integralImage(uint8_t*x, int n, int m){
     unsigned long * out = (unsigned long  *)malloc(n*m*sizeof(unsigned long));
     
@@ -34,35 +37,48 @@ unsigned long * integralImage(uint8_t*x, int n, int m){
     return out;
 }
 
-__global__ void image_integral(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal)
+__global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal)
+{
+    // Thread Ids equal to block Ids because the each blocks contains one thread only.
+    //int col = blockIdx.x;
+    int row = blockIdx.x;
+
+    for (int j = 0; j < colsTotal; ++j)
+        {
+            if (j >=1)
+            {
+                b[row*colsTotal + j] = a[row*colsTotal + j] + b[row*colsTotal + j - 1];
+            } else {
+                b[row*colsTotal + j] = a[row*colsTotal + j];
+            } 
+        }
+}
+
+__global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, int colsTotal)
 {
     // Thread Ids equal to block Ids because the each blocks contains one thread only.
     int col = blockIdx.x;
-    int row = blockIdx.y;
-    int temp=0;
+    //int row = blockIdx.y;
 
-    if(col < colsTotal && row < rowsTotal)
-    {
-        // The first loop iterates from zero to the Y index of the thread which represents the corresponding element of the output/input array.  
-        for(int r=0;r<=row;r++)
+    for (int i = 0; i < rowsTotal; ++i)
         {
-            // The second loop iterates from zero to the X index of the thread which represents the corresponding element of the output/input array  
-            for(int c=0; c<=col; c++)
+            if (i >=1)
             {
-                temp = temp+a[r*colsTotal+c];
-            }
-        }
+                b[i*colsTotal + col] = a[i*colsTotal + col] + b[(i-1)*colsTotal + col];
+            } else {
+                b[i*colsTotal + col] = a[i*colsTotal + col];
+            } 
     }
-
-    //Transfer the final result to the output array
-    b[row*colsTotal+col]=temp;
 }
+
+
 
 int main()
 {
+    int print = 0;
 
     int width, height, bpp;
-    uint8_t* matrix_a = stbi_load("poppy.jpg", &width, &height, &bpp, 1);
+    uint8_t* matrix_a = stbi_load("big.jpg", &width, &height, &bpp, 1);
     int total_e = width*height;
     int widthstep = total_e*sizeof(unsigned long);
 
@@ -73,11 +89,25 @@ int main()
         a[i] = (unsigned long)matrix_a[i];
     }
 
+    if (print==1)
+    {
+        cout << "Input"<<endl;
+        for(int r=0;r<height;r++)
+        {
+            for(int c=0; c<width;c++)
+            {
+                cout << a[r*width+c]<<" ";
+            }
+            cout << endl;
+        }
+    }
+
     std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
     std::cout << "Calculating Integral Image..." << std::endl;
 
     unsigned long * matrix_b= (unsigned long  *)malloc(widthstep);
+    unsigned long * matrix_t= (unsigned long  *)malloc(widthstep);
 
 
     for(int r=0;r<height;r++)
@@ -85,50 +115,77 @@ int main()
         for(int c=0; c<width;c++)
         {
             matrix_b[r*width+c]=0;
+            matrix_t[r*width+c]=0;
         }
     }
 
     std::cout << "Copied image" << std::endl;
 
-    unsigned long * d_matrix_a, * d_matrix_b;
+    unsigned long * d_matrix_a, * d_matrix_b, * d_matrix_t;
 
 
     cudaMalloc(&d_matrix_a,widthstep);
     cudaMalloc(&d_matrix_b,widthstep);
+    cudaMalloc(&d_matrix_t,widthstep);
+
 
     cudaMemcpy(d_matrix_a,a,widthstep,cudaMemcpyHostToDevice);
     cudaMemcpy(d_matrix_b,matrix_b,widthstep,cudaMemcpyHostToDevice);
+    cudaMemcpy(d_matrix_t,matrix_t,widthstep,cudaMemcpyHostToDevice);
 
-    //Creating a grid where the number of blocks are equal to the number of pixels or input matrix elements.
-
-    //Each block contains only one thread.
-
-    dim3 grid(height,width);
 
     std::cout << "starting cuda" << std::endl;
 
 
-    // struct timeval start, end;
-    // gettimeofday(&start, NULL);
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
 
-    image_integral<<<grid,1>>>(d_matrix_a, d_matrix_b,height,width);
+    
+    sum_rows<<<height,1>>>(d_matrix_a, d_matrix_t,height,width);
+    sum_columns<<<width,1>>>(d_matrix_t, d_matrix_b,height,width);
 
     cudaThreadSynchronize();
 
-    // gettimeofday(&end, NULL);
 
-    // double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+    gettimeofday(&end, NULL);
 
-    // std::cout << "Total time: " << time_tot <<std::endl;
+    double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+
+    std::cout << "Total parallel time: " << time_tot <<std::endl;
 
     cudaMemcpy(matrix_b,d_matrix_b,widthstep,cudaMemcpyDeviceToHost);
+    cudaMemcpy(matrix_t,d_matrix_t,widthstep,cudaMemcpyDeviceToHost);
+
+
+    if (print==1)
+    {
+        cout << "Cuda Output"<<endl;
+        for(int r=0;r<height;r++)
+        {
+            for(int c=0; c<width;c++)
+            {
+                cout << matrix_b[r*width+c]<<" ";
+            }
+            cout << endl;
+        }
+    }
+    
 
     std::cout << "starting serial" << std::endl;
 
+    gettimeofday(&start, NULL);
+
     unsigned long* integral_image = integralImage(matrix_a, height, width);
 
+    gettimeofday(&end, NULL);
+
+    time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+
+    std::cout << "Total serial time: " << time_tot <<std::endl;
+
+
     std::cout << "finish serial" << std::endl;
-int count =0;
+    int count =0;
 
     for (int i = 0; i < width*height; ++i)
     {
@@ -139,7 +196,9 @@ int count =0;
         }
     }
 
-    std::cout<<count<<std::endl;
+    std::cout<<"Errors ";
+    std::cout<<count;
+    std::cout<<" over ";
     std::cout<<width*height<<std::endl;
 
 
