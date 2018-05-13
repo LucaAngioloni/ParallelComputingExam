@@ -9,7 +9,7 @@
 using namespace std;
 
 
-int print = 1;
+int print = 0;
 
 void print_help(){
     std::cout << "usage: cuda -p <input image path> [-t <number of threads (int) (default:platform dependent)>] [-json]" << std::endl << std::endl;
@@ -54,6 +54,11 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     int start = row*size_per_thread;
     int end = start + size_per_thread;
 
+    if (row==rowsTotal-1)
+    {
+        start = (n_thread-1)*size_per_thread;
+        end = rowsTotal+1
+    }
     for (int k = start; k < end; ++k)
     {
             for (int j = 0; j < colsTotal; ++j)
