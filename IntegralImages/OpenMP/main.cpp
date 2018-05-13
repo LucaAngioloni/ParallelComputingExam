@@ -33,7 +33,7 @@
 #include <omp.h>
 
 void print_help(){
-    std::cout << "usage: openmp -p <input image path> [-t <number of threads (int) (default:platform dependent)>]" << std::endl << std::endl;
+    std::cout << "usage: openmp -p <input image path> [-t <number of threads (int) (default:platform dependent)>] [-json]" << std::endl << std::endl;
 
     std::cout << "To see this menu again: openmp -h" << std::endl;
 }
@@ -53,12 +53,17 @@ int main(int argc, char **argv){
             print_help();
             return 2;
         }
+
+        bool json = input.cmdOptionExists("-json");
+
     	int width, height, bpp;
     	uint8_t* image = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
 
-    	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
+    	if(!json){
+        std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
         std::cout << "Calculating Integral Image..." << std::endl;
+        }
 
         int threads = 0;
 
@@ -75,7 +80,17 @@ int main(int argc, char **argv){
 
         double end_omp = omp_get_wtime();
 
-        std::cout << "Total time wall time omp: " << end_omp - start_omp <<std::endl;
+        double time_tot = end_omp - start_omp;
+        
+        if (!json)
+        {
+            std::cout << "Total time wall time omp: " << time_tot <<std::endl;
+        }
+        
+        if (json)
+        {
+            std::cout << "{time: " << time_tot << ", width: " << width << ", height: " << height << "}" << std::endl;
+        }
 
         delete [] integral_image;
 

@@ -14,7 +14,7 @@ const int BLOCK_ROWS = 8;
 int print = 0;
 
 void print_help(){
-    std::cout << "usage: cuda -p <input image path> [-t <number of threads (int) (default:platform dependent)>]" << std::endl << std::endl;
+    std::cout << "usage: cuda -p <input image path> [-t <number of threads (int) (default:platform dependent)>] [-json]" << std::endl << std::endl;
 
     std::cout << "To see this menu again: cuda -h" << std::endl;
 }
@@ -100,6 +100,8 @@ int main(int argc, char **argv)
             return 2;
         }
 
+        bool json = input.cmdOptionExists("-json");
+
         int width, height, bpp;
         uint8_t* matrix_a = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
         int total_e = width*height;
@@ -125,9 +127,11 @@ int main(int argc, char **argv)
             }
         }
 
+        if(!json){
         std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
         std::cout << "Calculating Integral Image..." << std::endl;
+        }
 
         unsigned long * matrix_b= (unsigned long  *)malloc(widthstep);
         unsigned long * matrix_t= (unsigned long  *)malloc(widthstep);
@@ -142,7 +146,9 @@ int main(int argc, char **argv)
             }
         }
 
+        if(!json){
         std::cout << "Copied image" << std::endl;
+        }
 
         unsigned long * d_matrix_a, * d_matrix_b, * d_matrix_t;
 
@@ -156,9 +162,9 @@ int main(int argc, char **argv)
         cudaMemcpy(d_matrix_b,matrix_b,widthstep,cudaMemcpyHostToDevice);
         cudaMemcpy(d_matrix_t,matrix_t,widthstep,cudaMemcpyHostToDevice);
 
-
+        if(!json){
         std::cout << "starting cuda" << std::endl;
-
+        }
 
         struct timeval start, end;
         gettimeofday(&start, NULL);
@@ -174,7 +180,9 @@ int main(int argc, char **argv)
 
         double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
 
+        if(!json){
         std::cout << "Total parallel time: " << time_tot <<std::endl;
+        }
 
         cudaMemcpy(matrix_b,d_matrix_b,widthstep,cudaMemcpyDeviceToHost);
         cudaMemcpy(matrix_t,d_matrix_t,widthstep,cudaMemcpyDeviceToHost);
@@ -193,8 +201,9 @@ int main(int argc, char **argv)
             }
         }
         
-
+        if(!json){
         std::cout << "starting serial" << std::endl;
+        }
 
         gettimeofday(&start, NULL);
 
@@ -202,12 +211,14 @@ int main(int argc, char **argv)
 
         gettimeofday(&end, NULL);
 
-        time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
+        double time_tot_serial = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
 
-        std::cout << "Total serial time: " << time_tot <<std::endl;
-
+        if(!json){
+        std::cout << "Total serial time: " << time_tot_serial <<std::endl;
 
         std::cout << "finish serial" << std::endl;
+        }
+
         int count =0;
 
         for (int i = 0; i < width*height; ++i)
@@ -219,11 +230,17 @@ int main(int argc, char **argv)
             }
         }
 
+        if(!json){
         std::cout<<"Errors ";
         std::cout<<count;
         std::cout<<" over ";
         std::cout<<width*height<<std::endl;
+        }
 
+        if (json)
+        {
+            std::cout << "{time: " << time_tot << ", width: " << width << ", height: " << height << ", time_serial: " << time_tot_serial << "}" << std::endl;   
+        }
 
         cudaFree(d_matrix_a);
         cudaFree(d_matrix_b);

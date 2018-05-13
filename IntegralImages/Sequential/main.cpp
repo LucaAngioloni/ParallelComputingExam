@@ -33,7 +33,7 @@
 #include "input_parser.h"
 
 void print_help(){
-    std::cout << "usage: sequential -p <input image path>" << std::endl << std::endl;
+    std::cout << "usage: sequential -p <input image path> [-json]" << std::endl << std::endl;
 
     std::cout << "To see this menu again: sequential -h" << std::endl;
 }
@@ -53,12 +53,16 @@ int main(int argc, char **argv){
             print_help();
             return 2;
         }
+
+        bool json = input.cmdOptionExists("-json");
     	int width, height, bpp;
     	uint8_t* rgb_image = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
 
+        if(!json){
     	std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
         std::cout << "Calculating Integral Image..." << std::endl;
+        }
 
         struct timeval start, end;
         gettimeofday(&start, NULL);
@@ -69,8 +73,15 @@ int main(int argc, char **argv){
 
         double time_tot = ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6;
 
-        std::cout << "Total time: " << time_tot <<std::endl;
-
+        if (!json)
+        {
+            std::cout << "Total time: " << time_tot <<std::endl;
+        }
+        
+        if (json)
+        {
+            std::cout << "{time: " << time_tot << ", width: " << width << ", height: " << height << "}" << std::endl;   
+        }
         delete [] integral_image;
 
         stbi_image_free(rgb_image);
