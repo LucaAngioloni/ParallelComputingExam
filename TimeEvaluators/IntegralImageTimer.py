@@ -4,6 +4,8 @@ import os
 import subprocess
 import json
 
+from timeit import default_timer as timer
+
 repeats = 5
 
 threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
@@ -26,6 +28,8 @@ cuda_comand = "../IntegralImages/CUDA/cuda -json"
 squential_results = np.zeros((repeats,len(images)))
 omp_results = np.zeros((repeats,len(images), len(threads)))
 cuda_results = np.zeros((repeats,len(images), len(threads)))
+
+start_time = timer()
 
 j = 0
 for image in images:
@@ -56,9 +60,13 @@ for image in images:
             t = t+1
     j = j+1
 
+end_time = timer()
+
 print(squential_results)
 print(omp_results)
 print(cuda_results)
+
+print("\n\nTime elapsed: " + "{0:.2f}".format((end_time - start_time)) + " s")
 
 np.save("sequential_results_integral.npy", squential_results)
 np.save("omp_results_integral.npy", omp_results)

@@ -4,6 +4,8 @@ import os
 import subprocess
 import json
 
+from timeit import default_timer as timer
+
 repeats = 5
 
 threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
@@ -25,6 +27,8 @@ java_comand = "java -classpath ../HistogramEQParallel/out/production/HistogramEQ
 
 serial_results = np.zeros((repeats,len(images)))
 parallel_results = np.zeros((repeats,len(images), len(threads)))
+
+start_time = timer()
 
 j = 0
 for image in images:
@@ -48,8 +52,12 @@ for image in images:
             t = t+1
     j = j+1
 
+end_time = timer()
+
 print(serial_results)
 print(parallel_results)
+
+print("\n\nTime elapsed: " + "{0:.2f}".format((end_time - start_time)) + " s")
 
 np.save("serial_results.npy", serial_results)
 np.save("parallel_results.npy", parallel_results)
