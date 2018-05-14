@@ -195,7 +195,18 @@ int main(int argc, char **argv)
         struct timeval start, end;
         gettimeofday(&start, NULL);
 
-        int num_thread = 3000;
+        int num_thread = 0;
+
+        if(input.cmdOptionExists("-t")){
+            std::string num_threads_string = input.getCmdOption("-t");
+            if (num_threads_string != ""){
+                num_thread = atoi(num_threads_string.c_str());
+            } else {
+                num_thread = height;
+            }
+        } else {
+            num_thread = height;
+        }
 
         
         sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
