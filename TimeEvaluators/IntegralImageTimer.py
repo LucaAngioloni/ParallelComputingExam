@@ -8,7 +8,7 @@ from timeit import default_timer as timer
 
 repeats = 5
 
-threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
 
 directory = 'images/'
 
