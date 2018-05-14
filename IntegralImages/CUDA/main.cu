@@ -54,7 +54,7 @@ __global__ void sum_rows(unsigned long *a, unsigned long *b, int rowsTotal, int 
     int start = row*size_per_thread;
     int end = start + size_per_thread;
 
-    if row >=rowsTotal{ return; }
+    if (row >=rowsTotal){ return; }
 
     if (row==n_thread-1)
     {
@@ -85,7 +85,7 @@ __global__ void sum_columns(unsigned long *a, unsigned long *b, int rowsTotal, i
     int start = col*size_per_thread;
     int end = start + size_per_thread;
 
-    if col >=colsTotal{ return; }
+    if (col >=colsTotal){ return; }
 
     if (col==n_thread-1)
     {
