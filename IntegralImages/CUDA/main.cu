@@ -213,8 +213,8 @@ int main(int argc, char **argv)
         }
 
         
-        sum_rows<<<num_thread_h,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
-        sum_columns<<<num_thread_w,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
+        sum_rows<<<num_thread_h,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread_h);
+        sum_columns<<<num_thread_w,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread_w);
 
         cudaThreadSynchronize();
 
