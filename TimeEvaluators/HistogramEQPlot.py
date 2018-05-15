@@ -14,10 +14,13 @@ threads = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
 plt.plot(sizes, serial_results_mean)
 plt.xlabel('pixel')
 plt.ylabel('time(seconds)')
+a = np.min(parallel_results_mean, axis=1)
+plt.plot(sizes, a)
 
-plt.plot(sizes, parallel_results_mean[:,3])
+# plt.plot(sizes, parallel_results_mean[:,3])
 plt.show()
 
-
-plt.plot(np.log(threads), parallel_results_mean[6,:])
+plt.xlabel('threads')
+plt.ylabel('time(seconds)')
+plt.plot(threads, parallel_results_mean[6,:])
 plt.show()
