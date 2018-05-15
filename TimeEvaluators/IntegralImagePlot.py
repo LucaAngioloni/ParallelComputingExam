@@ -11,12 +11,13 @@ cuda_results_mean = np.mean(cuda_results, axis=0)
 
 sizes = np.power(np.array([100, 200, 500, 1000, 2000, 5000, 10000]), 1)
 
-threads = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
+threads = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096])
 
 plt.plot(sizes, sequential_results_mean)
 plt.plot(sizes, omp_results_mean[:,3])
-plt.plot(sizes, cuda_results_mean[:,10])
+plt.plot(sizes, cuda_results_mean[:,7])
 plt.show()
 
-plt.plot(np.log(threads), omp_results_mean[6,:])
+plt.plot(threads, omp_results_mean[6,:])
+plt.plot(threads, cuda_results_mean[6,:])
 plt.show()
