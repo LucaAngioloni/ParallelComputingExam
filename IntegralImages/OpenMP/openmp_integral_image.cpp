@@ -31,6 +31,13 @@ unsigned long * integralImageMP(img_type*x, int n, int m, int threads){
         omp_set_num_threads(threads); // Use n threads for all consecutive parallel regions
     }
 
+    // int size_per_thread_rows = n/threads;
+    // int size_per_thread_columns = m/threads;
+
+    // int y = floor((double)size_per_thread_rows/8)*8;
+    // int z = floor((double)size_per_thread_columns/8)*8;
+
+    // #pragma omp parallel for schedule(static,y)
     #pragma omp parallel
     #pragma omp for
     for (int i = 0; i < n; ++i)
@@ -45,7 +52,7 @@ unsigned long * integralImageMP(img_type*x, int n, int m, int threads){
             } 
         }
     }
-    //intel profiling vtune
+    //#pragma omp parallel for //schedule(static,z)
     #pragma omp for
     for (int j = 0; j < m; ++j)
     {
