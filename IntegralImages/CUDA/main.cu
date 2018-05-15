@@ -195,22 +195,26 @@ int main(int argc, char **argv)
         struct timeval start, end;
         gettimeofday(&start, NULL);
 
-        int num_thread = 0;
+        int num_thread_h = 0;
+        int num_thread_w = 0;
 
         if(input.cmdOptionExists("-t")){
             std::string num_threads_string = input.getCmdOption("-t");
             if (num_threads_string != ""){
-                num_thread = atoi(num_threads_string.c_str());
+                num_thread_h = atoi(num_threads_string.c_str());
+                num_thread_w = num_thread_h;
             } else {
-                num_thread = height;
+                num_thread_h = height;
+                num_thread_w = width;
             }
         } else {
-            num_thread = height;
+            num_thread_h = height;
+            num_thread_w = width;
         }
 
         
-        sum_rows<<<num_thread,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
-        sum_columns<<<num_thread,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
+        sum_rows<<<num_thread_h,1>>>(d_matrix_a, d_matrix_t,height,width, num_thread);
+        sum_columns<<<num_thread_w,1>>>(d_matrix_t, d_matrix_b,height,width, num_thread);
 
         cudaThreadSynchronize();
 
