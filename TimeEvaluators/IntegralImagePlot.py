@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 sequential_results = np.load("sequential_results_integral.npy")
 omp_results = np.load("omp_results_integral.npy")
 cuda_results = np.load("cuda_results_integral.npy")
+cuda_max_threads = np.load("cuda_results_integral_max-threads.npy")
 
 sequential_results_mean = np.mean(sequential_results, axis=0)
 omp_results_mean = np.mean(omp_results, axis=0)
 cuda_results_mean = np.mean(cuda_results, axis=0)
+cuda_max_mean = np.mean(cuda_max_threads, axis=0)
 
 #sizes = np.power(np.array([100, 200, 500, 1000, 2000, 5000, 10000]), 1)
 sizes = np.power(np.array([16000, 64000, 400000, 1600000, 6400000, 40005000, 160010000]), 1)
@@ -19,6 +21,7 @@ plt.ylabel('time(seconds)')
 plt.plot(sizes, sequential_results_mean, label='Sequential')
 plt.plot(sizes, omp_results_mean[:,3], label='OpenMP')
 plt.plot(sizes, cuda_results_mean[:,7], label='Cuda')
+plt.plot(sizes, cuda_max_mean, label='Cuda Max')
 plt.legend(framealpha=0.5)
 plt.show()
 
