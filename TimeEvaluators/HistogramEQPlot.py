@@ -11,11 +11,12 @@ sizes = np.power(np.array([16000, 64000, 400000, 1600000, 6400000, 40005000, 160
 
 threads = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
 
-plt.plot(sizes, serial_results_mean)
+plt.plot(sizes, serial_results_mean, label='Serial')
 plt.xlabel('pixel')
 plt.ylabel('time(seconds)')
-a = np.min(parallel_results_mean, axis=1)
-plt.plot(sizes, a)
+best_wrt_nthread = np.min(parallel_results_mean, axis=1)
+plt.plot(sizes, best_wrt_nthread, label='Java Thread')
+plt.legend(framealpha=0.5)
 
 # plt.plot(sizes, parallel_results_mean[:,3])
 plt.show()
