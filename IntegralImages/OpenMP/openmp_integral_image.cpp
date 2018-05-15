@@ -63,7 +63,7 @@ void transpose(unsigned long *src, unsigned long *dst, const int N, const int M)
 //     }
 // }
 
-unsigned long * integralImageMP(img_type*x, int n, int m, int threads){
+unsigned long * integralImageMP(unsigned long*x, int n, int m, int threads){
     // int lda = ROUND_UP(m, 16);
     // int ldb = ROUND_UP(n, 16);
     unsigned long * out = new unsigned long[n*m];

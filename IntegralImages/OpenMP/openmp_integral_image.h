@@ -36,4 +36,4 @@ typedef uint8_t img_type;
  *
  * @return     The integral image calculated from the input image x.
  */
-unsigned long * integralImageMP(img_type*x, int n, int m, int threads);
+unsigned long * integralImageMP(unsigned long*x, int n, int m, int threads);

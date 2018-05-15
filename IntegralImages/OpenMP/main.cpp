@@ -58,7 +58,12 @@ int main(int argc, char **argv){
 
     	int width, height, bpp;
     	uint8_t* image = stbi_load(in_file.c_str(), &width, &height, &bpp, 1);
+        unsigned long* long_image = new unsigned long[height*width];
 
+        for (int i = 0; i < height*width; ++i)
+        {
+            long_image[i] = image[i];
+        }
     	if(!json){
         std::cout << "w: " << width << " h: " << height << " b: " << bpp << std::endl;
 
@@ -76,7 +81,7 @@ int main(int argc, char **argv){
 
         double start_omp = omp_get_wtime();
 
-        unsigned long* integral_image = integralImageMP(image, height, width, threads);
+        unsigned long* integral_image = integralImageMP(long_image, height, width, threads);
 
         double end_omp = omp_get_wtime();
 
@@ -93,6 +98,7 @@ int main(int argc, char **argv){
         }
 
         delete [] integral_image;
+        delete [] long_image;
 
         stbi_image_free(image);
         
