@@ -40,7 +40,7 @@ unsigned long * integralImage(img_type*x, int n, int m){
             } else {
                 if (j>=1)
                 {
-                    val += out[i*m + j -1];
+                    val += out[i*m + j - 1];
                 }
             }
             out[i*m + j] = val;

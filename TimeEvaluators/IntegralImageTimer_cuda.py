@@ -21,7 +21,7 @@ for dirpath,_,filenames in os.walk(directory):
 
 images.sort()
 
-cuda_comand = "../IntegralImages/CUDA/cuda -json"
+cuda_comand = "../Integral_Images_(final-term)/Code/CUDA/cuda -json"
 
 cuda_results = np.zeros((repeats,len(images)))
 

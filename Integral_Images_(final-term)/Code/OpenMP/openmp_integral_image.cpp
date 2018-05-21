@@ -107,12 +107,12 @@ unsigned long * integralImageMP(unsigned long*x, int n, int m, int threads){
     // }
 
     #pragma omp parallel for
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < m; ++i)
     {
-        rows[i*m] = out[i*m];
-        for (int j = 1; j < m; ++j)
+        rows[i*n] = out[i*n];
+        for (int j = 1; j < n; ++j)
         {
-            rows[i*m + j] = out[i*m + j] + rows[i*m + j - 1];
+            rows[i*n + j] = out[i*n + j] + rows[i*n + j - 1];
         }
     }
 

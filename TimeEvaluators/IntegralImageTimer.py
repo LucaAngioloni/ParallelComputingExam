@@ -8,7 +8,7 @@ from timeit import default_timer as timer
 
 repeats = 5
 
-threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+threads = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096] # on not so powerful computers 1024, 2048 and 4096 threads are too much
 
 directory = 'images/'
 
@@ -21,9 +21,9 @@ for dirpath,_,filenames in os.walk(directory):
 
 images.sort()
 
-sequential_comand = "../IntegralImages/Sequential/sequential -json"
-omp_comand = "../IntegralImages/OpenMP/openmp -json"
-cuda_comand = "../IntegralImages/CUDA/cuda -json"
+sequential_comand = "../Integral_Images_(final-term)/Code/Sequential/sequential -json"
+omp_comand = "../Integral_Images_(final-term)/Code/OpenMP/openmp -json"
+cuda_comand = "../Integral_Images_(final-term)/Code/CUDA/cuda -json"
 
 squential_results = np.zeros((repeats,len(images)))
 omp_results = np.zeros((repeats,len(images), len(threads)))
