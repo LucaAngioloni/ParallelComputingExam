@@ -15,7 +15,7 @@ plt.plot(sizes, serial_results_mean, label='Serial', marker='o')
 plt.xlabel('pixel')
 plt.ylabel('time(seconds)')
 best_wrt_nthread = np.min(parallel_results_mean, axis=1)
-plt.plot(sizes, best_wrt_nthread, label='Java Thread', marker='o')
+plt.plot(sizes, best_wrt_nthread, label='Java Thread', marker='o',  linestyle=':')
 plt.legend(framealpha=0.5)
 
 # plt.plot(sizes, parallel_results_mean[:,3])
