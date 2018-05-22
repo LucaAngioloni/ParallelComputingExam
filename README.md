@@ -45,6 +45,14 @@ For this exercise we used C++ for serial implementation, openMP and CUDA for the
 
 ![8f.png](./img/finterm.009.jpeg)
 
+![9f.png](./img/finterm.0010.jpeg)
+
+![10f.png](./img/finterm.011.jpeg)
+
+![11f.png](./img/finterm.012.jpeg)
+
+
+
 
 
 
