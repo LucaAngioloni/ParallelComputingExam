@@ -23,6 +23,8 @@ For this exercise we used Java for serial implementation and Java threads for th
 
 ![8m.png](./img/pc_presentation.009.jpeg)
 
+![9m.png](./img/pc_presentation.010.jpeg)
+
 ## Integral Image
 
 For this exercise we used C++ for serial implementation, openMP and CUDA for the parallel implementation
@@ -35,6 +37,14 @@ For this exercise we used C++ for serial implementation, openMP and CUDA for the
 
 ![4f.png](./img/finterm.005.jpeg)
 
-### TO BE CONTINUED...
+![5f.png](./img/finterm.006.jpeg)
+
+![6f.png](./img/finterm.007.jpeg)
+
+![7f.png](./img/finterm.008.jpeg)
+
+![8f.png](./img/finterm.009.jpeg)
+
+
 
 
