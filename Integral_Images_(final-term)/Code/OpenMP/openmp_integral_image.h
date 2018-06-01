@@ -30,9 +30,10 @@ typedef uint8_t img_type;
 /**
  * @brief      Calculates the integral image of an input image x.
  *
- * @param      x     The input image (1D array)
- * @param[in]  n     The height of the image
- * @param[in]  m     The width of the image
+ * @param      x     		The input image (1D array)
+ * @param[in]  n     		The height of the image
+ * @param[in]  m     		The width of the image
+ * @param[in]  threads     	The number of threads to use
  *
  * @return     The integral image calculated from the input image x.
  */
